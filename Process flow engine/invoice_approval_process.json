@@ -1,0 +1,232 @@
+{
+    "flows": [
+        {
+            "name": "start",
+            "action": {
+                "tasks": [
+                    {
+                        "name": "update_properties",
+                        "function_name": "update_properties",
+                        "condition": "True",
+                        "params": {
+                            "document_type": "params.document_type.val",
+                            "document_id": "params.transaction_id.val",
+                            "outlet_id": "params.store_id.val",
+                            "bill_id": "params.bill_id.val",
+                            "transaction_id": "params.transaction_id.val",
+                            "name": "params.store_name.val",
+                            "salesman_id": "params.salesman_id.val",
+                            "salesman_name": "params.salesman_name.val",
+                            "ase_territory_id": "params.sales_territory.val",
+                            "territory_name": "params.ase_territory_name.val",
+                            "present_status": "'Waiting for Invoice Upload'",
+                            "distributor_status": "'PENDING'",
+                            "distributor_id": "params.distributor_id.val",
+                            "request_user_id": "params.user_id.val",
+                            "bill_time": "params.bill_date.val"
+                        }
+                    }
+                ],
+                "name": "start_process",
+                "condition": "not params.bill_id.isNone and not params.transaction_id.isNone",
+                "params": ""
+            },
+            "connectors": [
+                {
+                    "name": "start connector1",
+                    "condition": "True",
+                    "params": "",
+                    "next_step": "invoice-upload-step"
+                }
+            ],
+            "step_type": "start",
+            "actor": "any",
+            "delay": "",
+            "sla": null,
+            "form": null
+        },
+        {
+            "name": "invoice-upload-step",
+            "step_type": "manual",
+            "actor": "GROUP:Pran India PVT ltd Distributor",
+            "delay": "",
+            "form": "schedule_form",
+            "action": {
+                "name": "invoice-upload-action",
+                "condition": "params.image_url.val is not None",
+                "params": "",
+                "tasks": [
+                    {
+                        "name": "update-image-url",
+                        "function_name": "update_properties",
+                        "condition": "",
+                        "params": {
+                            "image_url": "params.image_url.val",
+                            "present_status": "'Waiting for MIS Approval'",
+                            "distributor_status": "'IN_PROGRESS'"
+                        }
+                    },
+                    {
+                        "name": "update-distributor-remarks",
+                        "function_name": "update_properties",
+                        "condition": "len(params.remarks.get(''))>0",
+                        "params": {
+                            "distributor_remarks": "params.remarks.val"
+                        }
+                    },
+                    {
+                        "name": "update-distributor-invoice",
+                        "function_name": "update_properties",
+                        "condition": "len(params.invoice_no.get(''))>0",
+                        "params": {
+                            "invoice_no": "params.invoice_no.val"
+                        }
+                    }
+                ]
+            },
+            "connectors": [
+                {
+                    "name": "invoice-upload-connector",
+                    "condition": "True",
+                    "next_step": "manager_approval",
+                    "params": ""
+                }
+            ]
+        },
+        {
+            "name": "manager_approval",
+            "action": {
+                "tasks": [
+                    {
+                        "name": "update-status-properties",
+                        "function_name": "update_properties",
+                        "condition": "True",
+                        "params": {
+                            "admin_status": "params.status.val",
+                            "present_status": "'MIS_APPROVED'",
+                            "distributor_status": "'COMPLETED'"
+                        }
+                    },
+                    {
+                        "name": "update-resubmit-count",
+                        "function_name": "update_properties",
+                        "condition": "params.status.val=='RE_SUBMIT'",
+                        "params": {
+                            "mis_resubmit_count": "data.mis_resubmit_count.get(0)+1",
+                            "present_status": "'RE_SUBMIT'",
+                            "distributor_status": "'RE_SUBMIT'"
+                        }
+                    },
+                    {
+                        "name": "update-rejection-count",
+                        "function_name": "update_properties",
+                        "condition": "params.status.val=='REJECTED'",
+                        "params": {
+                            "mis_rejection_count": "data.mis_rejection_count.get(0)+1",
+                            "present_status": "'REJECTED'",
+                            "distributor_status": "'REJECTED'"
+                        }
+                    },
+                    {
+                        "name": "update-remarks-properties",
+                        "function_name": "update_properties",
+                        "condition": "len(params.remarks.get(''))>0",
+                        "params": {
+                            "admin_remarks": "params.remarks.val"
+                        }
+                    },
+                    {
+                        "name": "update-invoice-properties",
+                        "function_name": "update_properties",
+                        "condition": "len(params.invoice_no.get(''))>0",
+                        "params": {
+                            "invoice_no": "params.invoice_no.val"
+                        }
+                    }
+                ],
+                "name": "manager_approval_action",
+                "condition": "not params.status.isNone",
+                "params": ""
+            },
+            "connectors": [
+                {
+                    "name": "admin_approve_connector",
+                    "condition": "params.status.val in ('APPROVED','REJECTED')",
+                    "params": "",
+                    "next_step": "end"
+                },
+                {
+                    "name": "admin_approve_connector",
+                    "condition": "params.status.val == 'RE_SUBMIT'",
+                    "params": "",
+                    "next_step": "retake-invoice-step"
+                }
+            ],
+            "step_type": "manual",
+            "actor": "GROUP:Pran India PVT ltd National MIS Manager",
+            "delay": {},
+            "sla": null,
+            "form": "approval_form"
+        },
+        {
+            "name": "retake-invoice-step",
+            "step_type": "manual",
+            "actor": "GROUP:Pran India PVT ltd Distributor",
+            "delay": "",
+            "form": "schedule_form",
+            "action": {
+                "name": "retake-invoice",
+                "condition": "params.image_url.val is not None",
+                "params": "",
+                "tasks": [
+                    {
+                        "name": "update-image_url",
+                        "function_name": "update_properties",
+                        "condition": "",
+                        "params": {
+                            "image_url": "params.image_url.val",
+                            "present_status": "'Waiting for MIS Approval'",
+                            "distributor_status": "'IN_PROGRESS'"
+                        }
+                    }
+                ]
+            },
+            "connectors": [
+                {
+                    "name": "retake_invoice_connector",
+                    "condition": "True",
+                    "next_step": "manager_approval",
+                    "params": ""
+                }
+            ]
+        },
+        {
+            "name": "end",
+            "action": {
+                "tasks": [
+                    {
+                        "name": "update-end-step-properties",
+                        "function_name": "update_properties",
+                        "condition": "",
+                        "params": {
+                            "user": "params.user_id.val"
+                        }
+                    }
+                ],
+                "name": "end_step",
+                "condition": "True",
+                "params": ""
+            },
+            "connectors": [],
+            "step_type": "auto",
+            "actor": "",
+            "delay": {},
+            "sla": null,
+            "form": null
+        }
+    ],
+    "name": "Distributor Invoice Approval Process",
+    "description": "Approval process for Distributor Invoice",
+    "status": false,
+    "params": ""
+}

@@ -1,0 +1,321 @@
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+span:hover {
+  background-color: lavender;
+}
+
+.toolbar {
+  padding: 20px;
+  float: left;
+  margin-left: 50px;
+  border: 1px solid; }
+  .toolbar li {
+    list-style: none;
+    text-align: center;
+    margin: 0 auto 10px;
+    cursor: pointer;
+    position: relative;
+    padding-top: 10px; }
+    .toolbar li ~ li {
+      border-top: 1px solid #ccc; }
+  .toolbar span.is-desc {
+    position: absolute;
+    line-height: 45px;
+    padding-right: 0;
+    pointer-events: none;
+    font-size: 12px;
+    width: 100%;
+    text-align: center;
+    left: 0;
+    z-index: 99; }
+  .toolbar__item {
+    background: #ccc;
+    width: 120px;
+    height: 50px;
+    display: inline-block; }
+    .toolbar__item.active {
+      background: #9E7AB8; }
+      .toolbar__item.active.is-trapezoid {
+        border-bottom: 50px solid #9E7AB8; }
+    .toolbar__item.is-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%; }
+    .toolbar__item.is-small {
+      width: 50px; }
+    .toolbar__item.is-ellipse {
+      border-radius: 50%; }
+    .toolbar__item.is-rounded {
+      border-radius: 15px; }
+    .toolbar__item.is-diamond {
+      width: 50px;
+      -webkit-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+              transform: rotate(45deg); }
+    .toolbar__item.is-trapezoid {
+      border-bottom: 50px solid #ccc;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      height: 0;
+      width: 100px;
+      background: transparent !important; }
+
+.shadow-box {
+  background: #ffffff;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.33);
+  margin-bottom: 20px;
+  overflow: hidden; }
+
+body {font-family: Arial, Helvetica, sans-serif;}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: relative; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 50%; /* Full width */
+  height: 50%; /* Full height */
+  margin-left: 350px;
+  
+
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: grey;
+  color: white;
+}
+
+.modal-body {padding: 2px 16px;}
+
+.modal-footer {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
+
+</style>
+
+</head>
+
+
+
+<body>
+
+<section class="container">
+  <div class="main-wrapper">
+    <div class="row">
+      <div class="col-sm-3">
+        <h3 class="clearfix">
+          Tool box
+          <button class="btn btn-danger pull-right" id="clear">clear</button>
+        </h3>
+        <div class="shadow-box"> 
+          <div ondrop="drop(event)" ondragover="allowDrop(event)">
+          <ul class="toolbar"><p style="text-align: center; margin-top: 2px; font-size: 20px;"><b>Shapes</b></p>
+            <li>
+                <span id="diagram" class="is-desc">Start</span>
+                <span class="toolbar__item is-ellipse" id="Ellipse"></span>
+            </li>
+            <li>
+                <span id="diagram" class="is-desc">Process</span>
+                <span class="toolbar__item is-rectangle" id="Rectangle"></span>
+            </li>
+            <li>
+                <span id="diagram" class="is-desc" style="text-align: center;">Connector</span>
+                <span class="toolbar__item is-circle" id="Circle"></span>
+            </li>
+            <li>
+                <span id="diagram" class="is-desc">Decision</span>
+                <span class="toolbar__item is-diamond" id="Diamond"></span>
+            </li>
+            <li>
+                <span id="diagram" class="is-desc">End</span>
+                <span class="toolbar__item is-ellipse" id="Ellipse"></span>
+            </li>
+           
+            
+        </ul>
+        </div>
+
+<!---MODAL--->
+
+
+
+<!-- Trigger/Open The Modal -->
+<button id="myBtn" style="float: right; margin-right: 50px; margin-top: 15px;">Properties</button>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h2>Properties</h2>
+    </div>
+    <div class="modal-body">
+    <form>
+    <br>
+     <label for="fname">Name: </label>
+     <input type="text" id="fname" name="fname"><br><br>
+   
+     <label for="fname">Description: </label>
+     <input type="text" id="desc" name="desc"><br>
+
+     <p>Status: false</p>
+
+     <label for="fname">Params: </label>
+     <input type="text" id="param" name="param"><br><br>
+      
+    </div>
+    
+  </div>
+
+
+
+
+
+
+</div>
+
+
+<script>
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+btn.onclick = function() {
+  modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+
+
+
+
+
+	
+        
+<script>
+
+//Make the DIV element draggagle:
+dragElement(document.getElementById("diagram"));
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    /* if present, the header is where you move the DIV from:*/
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    /* otherwise, move the DIV from anywhere inside the DIV:*/
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+</script>
+       
+
+        
+
+       
+
+
+
+
+</body>
+</html>
